@@ -1,4 +1,6 @@
-const MockRepository = () {
+import AddProductUseCase from "./add-product.usecase";
+
+const MockRepository = () => {
     return {
         add: jest.fn(),
         find: jest.fn(),
@@ -8,7 +10,7 @@ const MockRepository = () {
 describe("Add Product usecase unit test", () => {
 
     it("should add a product", async () => {
-        const productRepository = new ProductRepository();
+        const productRepository = MockRepository();
         const usecase = new AddProductUseCase(productRepository);
 
         const input = {
@@ -19,7 +21,14 @@ describe("Add Product usecase unit test", () => {
         }
 
 
-        usecase.execute(input)
+        const result = await usecase.execute(input)
+
+        expect(productRepository.add).toHaveBeenCalled();
+        expect(result.id).toBeDefined;
+        expect(result.name).toBe(input.name);
+        expect(result.description).toBe(input.description);
+        expect(result.purchasePrice).toBe(input.purchasePrice);
+        expect(result.stock).toBe(input.stock);
     })
 
 })
