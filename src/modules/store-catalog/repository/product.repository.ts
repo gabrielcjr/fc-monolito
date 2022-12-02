@@ -18,4 +18,6 @@ export default class ProductRepository implements ProductGateway {
     find(id: string): Promise<Product> {
         throw new Error("Method not implemented.");
     }
+
+    
 }
