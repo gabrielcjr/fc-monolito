@@ -1,5 +1,6 @@
 import Id from "../../../@shared/domain/value-object/id.value-object";
 import Product from "../../domain/product.entity";
+import FindAllProductsUsecase from "./find-all-products.usecase";
 
 const product = new Product({
     id: new Id('1'),
@@ -17,21 +18,21 @@ const product2 = new Product({
 
 });
 
-const MockRepository = () => ({
+const MockRepository = () => {
     return {
-        findAll: jest.fn(() => [product, product2]),
-        find: jest.fn(() => product)
-    }
-})
+      find: jest.fn(),
+      findAll: jest.fn().mockReturnValue(Promise.resolve([product, product2])),
+    };
+  };
 
 describe("find all products use case", () => {
     it("should return all products", async () => {
         const productRepository = MockRepository();
-        const usecase = new FindAllProductsUseCase(productRepository);
+        const usecase = new FindAllProductsUsecase(productRepository);
         const result = await usecase.execute();
         
-        expect(result).toEqual([product, product2]);
         expect(productRepository.findAll).toHaveBeenCalled();
+        expect(result.products.length).toBe(2);
         expect(result.products[0].id).toEqual('1');
         expect(result.products[0].name).toEqual('Product 1');
         expect(result.products[0].description).toEqual('Product 1 description');
