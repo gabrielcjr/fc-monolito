@@ -1,4 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
+import Id from "../../@shared/domain/value-object/id.value-object";
+import Client from "../domain/client.entity";
 import { ClientModel } from "./client.model";
 import ClientRepository from "./client.repository";
 
@@ -40,4 +42,25 @@ describe("ProductRepository test", () => {
             expect(result.email).toEqual(client.email)
             expect(result.address).toEqual(client.address) 
            })
+
+           it("Should create a client", async () => { 
+            const client = new Client({
+                id: new Id("1"),
+                name: "Client 1",
+                email: "x@x.com",
+                address: "1234 Main St",
+           })
+
+           const repository = new ClientRepository();
+           await repository.add(client)
+
+            const result = await ClientModel.findByPk(client.id.id)
+
+            expect(result).toBeDefined()
+            expect(result.id).toEqual(client.id.id)
+            expect(result.name).toEqual(client.name)
+            expect(result.email).toEqual(client.email)
+            expect(result.address).toEqual(client.address)
+            expect(result.createdAt).toEqual(client.createdAt)
+        })    
 })
