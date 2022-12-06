@@ -1,24 +1,29 @@
-import { Sequelize } from "sequelize-typescript";
+import Id from "../../@shared/domain/value-object/id.value-object";
+import clientEntity from "../domain/client.entity";
+import Client from "../domain/client.entity";
+import ClientGateway from "../gateway/client.gateway";
 import { ClientModel } from "./client.model";
 
-describe("ClientRepository test", () => {
-    let sequelize: Sequelize;
+export default class ClientRepository implements ClientGateway {
 
-    beforeEach(async () => {
-        sequelize = new Sequelize({
-            dialect: "sqlite",
-            storage: ":memory:",
-            logging: false,
-            sync: { force: true },
-        });
-        await sequelize.addModels([ClientModel]);
-        await sequelize.sync();
-    })
+    add(client: clientEntity): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+    async find(id: string): Promise<clientEntity> {
+        const client = await ClientModel.findOne({ where: {id}})
 
-    afterEach(async () => {
-        await sequelize.close();
-    })
+        if(!client) {
+            throw new Error("Client not found")
+        }
 
-    
+        return new Client ({
+            id: new Id(client.id),
+            name: client.name,
+            email: client.email,
+            address: client.address,
+            createdAt: client.createdAt,
+            updatedAt: client.updatedAt
+        })
+    }
 
-})
+}

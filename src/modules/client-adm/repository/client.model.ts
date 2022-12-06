@@ -1,6 +1,6 @@
-import { Column, Model, PrimaryKey } from "sequelize-typescript";
+import { Column, Model, PrimaryKey, Table } from "sequelize-typescript";
 
-@table({
+@Table({
     tableName: "clients",
     timestamps: false
 })

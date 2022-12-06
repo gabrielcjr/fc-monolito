@@ -6,6 +6,8 @@ const client = {
     name: "John Doe",
     email: "x@x.com",
     address: "1234 Main St",
+    createdAt: new Date(),
+    updatedAt: new Date()
 }
 
 const MockRepository = () => {
@@ -31,6 +33,8 @@ describe("Find client use case", () => {
         expect(result.name).toEqual(client.name)
         expect(result.email).toEqual(client.email)
         expect(result.address).toEqual(client.address)
+        expect(result.createdAt).toEqual(client.createdAt)
+        expect(result.updatedAt).toEqual(client.updatedAt)
     })
 })
 
