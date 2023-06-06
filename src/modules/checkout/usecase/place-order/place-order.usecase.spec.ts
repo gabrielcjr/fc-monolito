@@ -26,7 +26,7 @@ describe("PlaceOrderUseCase", () => {
 
         it("should throw an error when product are not valid", async () => {
             const mockClientFacade = {
-                find: jest.fn().mockResolvedValue(null),
+                find: jest.fn().mockResolvedValue(true),
             };
             //@ts-expected-error - no params in constructor
             const placeOrderUseCase = new PlaceOrderUseCase();
@@ -35,7 +35,7 @@ describe("PlaceOrderUseCase", () => {
             //@ts-expect-error - spy on private method
             .spyOn(placeOrderUseCase, "validateProduct")
             //@ts-expect-error - not return never
-            .mockRejectedValue(new Error("No product selected"));
+            .mockRejectedValue(new Error("No products selected"));
 
             //@ts-expect-error - force set clientFacade
             placeOrderUseCase["_clientFacade"] = mockClientFacade;
@@ -45,7 +45,7 @@ describe("PlaceOrderUseCase", () => {
             await expect(placeOrderUseCase.execute(input)).rejects.toThrowError(
                 new Error("No products selected")
             );
-            expect(mockValidateProduct).toHaveBeenCalledTimes(0);
+            expect(mockValidateProduct).toHaveBeenCalledTimes(1);
         })
 
 
