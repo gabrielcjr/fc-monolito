@@ -13,7 +13,6 @@ export default class PlaceOrderUseCase implements UseCaseInterface {
         if (!client) {
             throw new Error("Client not found");
         }
-        // buscar o cliente. Caso não encontre -> client not found
         // validar produto
         // recuperar os produtos
 
