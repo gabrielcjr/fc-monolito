@@ -116,6 +116,14 @@ describe("PlaceOrderUseCase", () => {
     })
 
     describe("execute method", () => {
+        beforeAll(() => {
+            jest.useFakeTimers("modern");
+            jest.setSystemTime(mockDate);
+        });
+
+        afterAll(() => {
+            jest.useRealTimers();
+        })
 
         it("should throw an error when client is not found", async () => {
          
@@ -159,8 +167,74 @@ describe("PlaceOrderUseCase", () => {
             expect(mockValidateProduct).toHaveBeenCalledTimes(1);
         })
 
+        describe("place an order", () => {
+            const clientProps = {
+                id: "1c",
+                name: "Client 1",
+                document: "00000000000",
+                email: "client@user.com",
+                street: "Client street",
+                number: "1",
+                complement: "Client complement",
+                city: "Client city",
+                state: "Client state",
+                zipCode: "00000000",
+            }
 
+            const mockClientFacade = {
+                find: jest.fn().mockResolvedValue(clientProps),
+            }
+
+            const mockPaymentFacade = {
+                process: jest.fn(),
+            }
+
+            const mockCheckoutRepository = {
+                save: jest.fn(),
+            }
+
+            const mockInvoiceFacade = {
+                create: jest.fn().mockResolvedValue({id: "1i"}),
+            }
+
+            const placeOrderUseCase = new PlaceOrderUseCase(
+                mockClientFacade,
+                null,
+                null,
+                mockCheckoutRepository,
+                mockInvoiceFacade,
+                mockPaymentFacade
+            );
+
+            const products = {
+                "1": new Product({
+                    id: new Id("1"),
+                    name: "Product 1",
+                    description: "Product 1 description",
+                    salesPrice: 1,
+                }),
+                "2": new Product({
+                    id: new Id("2"),
+                    name: "Product 2",
+                    description: "Product 2 description",
+                    salesPrice: 2,
+                }),
+            };
+
+            const mockValidateProduct = jest
+            //@ts-expect-error - spy on private method
+            .spyOn(placeOrderUseCase, "validateProduct")
+            .mockResolvedValue(null);
+
+            const mockGetProducts = jest
+            //@ts-expect-error - spy on private method
+            .spyOn(placeOrderUseCase, "getProducts")
+            //@ts-expect-error - not return never
+            .mockImplementation((productId: keyof typeof products) => {
+                return Promise.resolve(products[productId]);
+            })
+
+
+        })
     })
-
-
 })
