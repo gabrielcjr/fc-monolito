@@ -40,7 +40,6 @@ describe("ProductRepository test", () => {
             expect(result.id.id).toEqual(client.id)
             expect(result.name).toEqual(client.name)
             expect(result.email).toEqual(client.email)
-            expect(result.address).toEqual(client.address) 
            })
 
            it("Should create a client", async () => { 
@@ -48,7 +47,13 @@ describe("ProductRepository test", () => {
                 id: new Id("1"),
                 name: "Client 1",
                 email: "x@x.com",
-                address: "1234 Main St",
+                document: "00000000000",
+                street: "Main St",
+                number: "1234",
+                complement: "Complement",
+                city: "City",
+                state: "State",
+                zipCode: "00000000",
            })
 
            const repository = new ClientRepository();
@@ -60,7 +65,15 @@ describe("ProductRepository test", () => {
             expect(result.id).toEqual(client.id.id)
             expect(result.name).toEqual(client.name)
             expect(result.email).toEqual(client.email)
-            expect(result.address).toEqual(client.address)
+            expect(result.document).toEqual(client.document)
+            expect(result.street).toEqual(client.street)
+            expect(result.number).toEqual(client.number)
+            expect(result.complement).toEqual(client.complement)
+            expect(result.city).toEqual(client.city)
+            expect(result.state).toEqual(client.state)
+            expect(result.zipCode).toEqual(client.zipCode)
             expect(result.createdAt).toEqual(client.createdAt)
+            expect(result.updatedAt).toEqual(client.updatedAt)
+
         })    
 })

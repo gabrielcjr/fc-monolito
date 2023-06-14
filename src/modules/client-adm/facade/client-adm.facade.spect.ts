@@ -37,6 +37,7 @@ describe("ClientAmdFacade test", () => {
             name: "Client 1",
             email: "x@x.com",
             address: "1234 Main St",
+            document: "00000000000",
         }
 
         await facade.add(input)
@@ -58,6 +59,7 @@ describe("ClientAmdFacade test", () => {
             name: "Client 1",
             email: "x@x.com",
             address: "1234 Main St",
+            document: "00000000000",
         }
 
         await facade.add(input)
@@ -67,7 +69,7 @@ describe("ClientAmdFacade test", () => {
         expect(client.id).toEqual(input.id)
         expect(client.name).toEqual(input.name)
         expect(client.email).toEqual(input.email)
-        expect(client.address).toEqual(input.address)
+        expect(client.street).toEqual(input.address)
 
         
     })
