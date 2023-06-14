@@ -234,6 +234,47 @@ describe("PlaceOrderUseCase", () => {
                 return Promise.resolve(products[productId]);
             })
 
+            it("should not be approved", async () => {
+                mockPaymentFacade.process = mockPaymentFacade.process.mockResolvedValue({
+                    transactonId: "1t",
+                    orderId: "1o",
+                    ammount: 100,
+                    status: "error",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                })
+
+                const input: PlaceOrderInputDto = {
+                    clientId: "1c",
+                    products: [
+                        {productId: "1"},
+                        {productId: "2"},
+                    ],
+                }
+
+                let output = await placeOrderUseCase.execute(input);
+
+                expect(output.invoiceId).toBeNull();
+                expect(output.total).toBe(70);
+                expect(output.products).toStrictEqual([
+                    { productId: "1"},
+                    { productId: "2"},
+                ])
+                expect(mockClientFacade.find).toHaveBeenCalledTimes(1);
+                expect(mockClientFacade.find).toHaveBeenCalledWith({id: "1c"});
+                expect(mockValidateProduct).toHaveBeenCalledTimes(1);
+                expect(mockValidateProduct).toHaveBeenCalledWith(input.products);
+                expect(mockGetProducts).toHaveBeenCalledTimes(2);
+                expect(mockCheckoutRepository.save).toHaveBeenCalledTimes(1);
+                expect(mockPaymentFacade.process).toHaveBeenCalledTimes(1);
+                expect(mockPaymentFacade.process).toHaveBeenCalledWith({
+                    clientId: output.id,
+                    ammount: output.total,
+                })
+                expect(mockInvoiceFacade.create).toHaveBeenCalledTimes(0);
+
+            })
+
 
         })
     })
