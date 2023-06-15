@@ -23,6 +23,10 @@ export default class Order extends BaseEntity {
         this._status = props.status || 'pending';
     }
 
+    approved(): void {
+        this._status = 'approved';
+    }
+
     get client(): Client {
         return this._client;
     }

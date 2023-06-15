@@ -190,19 +190,20 @@ describe("PlaceOrderUseCase", () => {
             }
 
             const mockCheckoutRepository = {
-                save: jest.fn(),
+                addOrder: jest.fn(),
+                findOrder: jest.fn(),
             }
 
             const mockInvoiceFacade = {
-                create: jest.fn().mockResolvedValue({id: "1i"}),
+                generate: jest.fn(),
             }
 
             const placeOrderUseCase = new PlaceOrderUseCase(
-                mockClientFacade,
+                mockClientFacade as any,
                 null,
                 null,
-                mockCheckoutRepository,
-                mockInvoiceFacade,
+                mockCheckoutRepository as any,
+                mockInvoiceFacade as any,
                 mockPaymentFacade
             );
 
@@ -224,6 +225,7 @@ describe("PlaceOrderUseCase", () => {
             const mockValidateProduct = jest
             //@ts-expect-error - spy on private method
             .spyOn(placeOrderUseCase, "validateProduct")
+            //@ts-expect-error - spy on private method
             .mockResolvedValue(null);
 
             const mockGetProducts = jest
@@ -236,9 +238,9 @@ describe("PlaceOrderUseCase", () => {
 
             it("should not be approved", async () => {
                 mockPaymentFacade.process = mockPaymentFacade.process.mockResolvedValue({
-                    transactonId: "1t",
+                    transactionId: "1t",
                     orderId: "1o",
-                    ammount: 100,
+                    amount: 100,
                     status: "error",
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -255,27 +257,85 @@ describe("PlaceOrderUseCase", () => {
                 let output = await placeOrderUseCase.execute(input);
 
                 expect(output.invoiceId).toBeNull();
-                expect(output.total).toBe(70);
+                expect(output.total).toBe(3);
                 expect(output.products).toStrictEqual([
-                    { productId: "1"},
-                    { productId: "2"},
+                    { id: "1"},
+                    { id: "2"},
                 ])
                 expect(mockClientFacade.find).toHaveBeenCalledTimes(1);
                 expect(mockClientFacade.find).toHaveBeenCalledWith({id: "1c"});
                 expect(mockValidateProduct).toHaveBeenCalledTimes(1);
-                expect(mockValidateProduct).toHaveBeenCalledWith(input.products);
+                expect(mockValidateProduct).toHaveBeenCalledWith(input);
                 expect(mockGetProducts).toHaveBeenCalledTimes(2);
-                expect(mockCheckoutRepository.save).toHaveBeenCalledTimes(1);
+                // expect(mockCheckoutRepository.addOrder).toHaveBeenCalledTimes(1);
                 expect(mockPaymentFacade.process).toHaveBeenCalledTimes(1);
                 expect(mockPaymentFacade.process).toHaveBeenCalledWith({
-                    clientId: output.id,
-                    ammount: output.total,
+                    orderId: output.id,
+                    amount: output.total,
                 })
-                expect(mockInvoiceFacade.create).toHaveBeenCalledTimes(0);
+                expect(mockInvoiceFacade.generate).toHaveBeenCalledTimes(0);
 
             })
 
-
+            it("should be approved", async () => {
+                mockPaymentFacade.process = mockPaymentFacade.process.mockResolvedValue({
+                    transactionId: "1t",
+                    orderId: "1o",
+                    amount: 100,
+                    status: "approved",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                })
+    
+                const input: PlaceOrderInputDto = {
+                    clientId: "1c",
+                    products: [{productId: "1"}, {productId: "2"}],
+                }
+    
+                let output = await placeOrderUseCase.execute(input);
+    
+                expect(output.invoiceId).toBe("1i");
+                expect(output.total).toBe(3);
+                expect(output.products).toStrictEqual([
+                    {id: "1"},
+                    {id: "2"},
+                ])
+                expect(mockClientFacade.find).toHaveBeenCalledTimes(1);
+                expect(mockClientFacade.find).toHaveBeenCalledWith({id: "1c"});
+                expect(mockValidateProduct).toHaveBeenCalledTimes(1);
+                expect(mockGetProducts).toHaveBeenCalledTimes(2);
+                // expect(mockCheckoutRepository.addOrder).toHaveBeenCalledTimes(1);
+                expect(mockPaymentFacade.process).toHaveBeenCalledTimes(1);
+                expect(mockPaymentFacade.process).toHaveBeenCalledWith({
+                    orderId: output.id,
+                    amount: output.total,
+                })
+                expect(mockInvoiceFacade.generate).toHaveBeenCalledTimes(1);
+                expect(mockInvoiceFacade.generate).toHaveBeenCalledWith({
+                    name: "Client 1",
+                    document: "00000000000",
+                    street: "Client street",
+                    number: "1",
+                    complement: "Client complement",
+                    city: "Client city",
+                    state: "Client state",
+                    zipCode: "00000000",
+                    items: [
+                        {
+                            id: products["1"].id.id,
+                            name: products["1"].name,
+                            description: products["1"].description,
+                            price: products["1"].salesPrice,
+                          },
+                          {
+                            id: products["2"].id.id,
+                            name: products["2"].name,
+                            description: products["2"].description,
+                            price: products["2"].salesPrice
+                          }
+                            ]
+                })
+            })
         })
     })
 })

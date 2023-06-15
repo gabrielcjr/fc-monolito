@@ -11,6 +11,6 @@ export interface PlaceOrderOutputDto {
     status: string;
     total: number;
     products: {
-        id: string;
+        id: string
     }[];
 }
