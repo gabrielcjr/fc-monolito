@@ -29,10 +29,16 @@ describe("ProductRepository test", () => {
                 id: "1",
                 name: "Client 1",
                 email: "x@x.com",
-                address: "1234 Main St",
+                document: "00000000000",
+                street: "Main St",
+                number: "1234",
+                complement: "Complement",
+                city: "City",
+                state: "State",
+                zipCode: "00000000",
                 createdAt: new Date(),
-                updatedAt: new Date()
-            })
+                updatedAt: new Date(),
+           })
 
             const repository = new ClientRepository();
             const result = await repository.find(client.id)

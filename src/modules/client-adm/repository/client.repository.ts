@@ -11,6 +11,7 @@ export default class ClientRepository implements ClientGateway {
             id: client.id.id,
             name: client.name,
             email: client.email,
+            document: client.document,
             street: client.street,
             number: client.number,
             complement: client.complement,
